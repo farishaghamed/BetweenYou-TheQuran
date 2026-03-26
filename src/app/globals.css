@@ -1,26 +1,194 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cream: #f5f0e8;
+  --cream-light: #faf7f2;
+  --olive: #6b7f5e;
+  --olive-muted: #7d8e70;
+  --olive-faint: rgba(107, 127, 94, 0.08);
+  --charcoal: #2d2d2d;
+  --charcoal-light: #4a4a4a;
+  --title-brown: #3f3a33;
+  --charcoal-faint: rgba(45, 45, 45, 0.6);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: var(--cream);
+  --color-cream-light: var(--cream-light);
+  --color-olive: var(--olive);
+  --color-olive-muted: var(--olive-muted);
+  --color-olive-faint: var(--olive-faint);
+  --color-charcoal: var(--charcoal);
+  --color-charcoal-light: var(--charcoal-light);
+  --color-charcoal-faint: var(--charcoal-faint);
+  --color-title-brown: var(--title-brown);
+  --font-sans: var(--font-cormorant);
+  --font-body: var(--font-nunito);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Animations ─────────────────────────────────────────── */
+
+/* Gentle fade — no transform, pure opacity */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Gentle reveal — fade + subtle rise */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+/* Title group rise — shifts upward after initial fade */
+@keyframes rise {
+  from { transform: translateY(0); }
+  to { transform: translateY(-20px); }
+}
+
+/* Ayah highlight — faint olive bg that fades out */
+@keyframes ayah-highlight-fade {
+  0% { background-color: rgba(107, 127, 94, 0.12); }
+  70% { background-color: rgba(107, 127, 94, 0.12); }
+  100% { background-color: transparent; }
+}
+
+.ayah-highlight {
+  animation: ayah-highlight-fade 2s ease-out both;
+}
+
+/* Spinner rotation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Utility animation classes ──────────────────────────── */
+
+.animate-fade-in {
+  animation: fade-in 1s ease-in-out both;
+}
+
+.animate-reveal {
+  animation: reveal 1s ease-in-out both;
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+  font-family: var(--font-body), serif;
+  overflow-x: hidden;
+}
+
+/* Subtle paper grain texture via SVG noise filter */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  mix-blend-mode: multiply;
+}
+
+/* ── Mobile app shell ───────────────────────────────────── */
+
+.app-shell {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  position: relative;
+}
+
+/* On larger screens, give the shell a subtle edge so it reads as a device frame */
+@media (min-width: 431px) {
+  body {
+    background: #eae5dc;
+  }
+  .app-shell {
+    background: var(--cream);
+    box-shadow: 0 0 80px rgba(0, 0, 0, 0.04);
+  }
+}
+
+/* ── Manuscript lighting ──────────────────────────────────
+   Soft vignette + radial illumination to give the paper
+   texture subtle depth, like light falling on a page.   */
+
+.manuscript-light {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    /* Radial illumination — soft brightness behind title area */
+    radial-gradient(
+      ellipse 50% 45% at 50% 42%,
+      rgba(250, 247, 240, 0.35) 0%,
+      transparent 70%
+    ),
+    /* Vignette — gently darker edges */
+    radial-gradient(
+      ellipse 80% 75% at 50% 50%,
+      transparent 50%,
+      rgba(58, 52, 42, 0.04) 100%
+    );
+}
+
+/* ── Audio controls ─────────────────────────────────────── */
+
+.audio-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: var(--olive-muted);
+  border-radius: 1px;
+  outline: none;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.audio-slider:hover {
+  opacity: 1;
+}
+
+.audio-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--olive);
+  cursor: pointer;
+}
+
+.audio-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--olive);
+  cursor: pointer;
+  border: none;
+}
+
+/* ── Selection ──────────────────────────────────────────── */
+
+::selection {
+  background: var(--olive-muted);
+  color: var(--cream);
 }
